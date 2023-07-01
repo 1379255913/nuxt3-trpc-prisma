@@ -1,0 +1,135 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model classes {
+  classID   Int       @id
+  classname String    @db.VarChar(20)
+  gradeID   Int
+  collegeID Int
+  majorID   Int
+  college   college   @relation(fields: [collegeID], references: [collegeID], onDelete: NoAction, onUpdate: NoAction, map: "classes_ibfk_1")
+  major     major     @relation(fields: [majorID], references: [majorID], onDelete: NoAction, onUpdate: NoAction, map: "classes_ibfk_2")
+  grades    grades    @relation(fields: [gradeID], references: [gradeID], onDelete: NoAction, onUpdate: NoAction, map: "classes_ibfk_3")
+  student   student[]
+
+  @@index([collegeID], map: "collegeID")
+  @@index([gradeID], map: "gradeID")
+  @@index([majorID], map: "majorID")
+}
+
+model college {
+  collegeID   Int        @id
+  collegename String     @db.VarChar(20)
+  classes     classes[]
+  course      course[]
+  grades      grades[]
+  major       major[]
+  student     student[]
+  teachers    teachers[]
+}
+
+model course {
+  cno           String          @id @db.Char(10)
+  coursename    String          @db.VarChar(20)
+  collegeID     Int?
+  Credit        Int
+  college       college?        @relation(fields: [collegeID], references: [collegeID], onDelete: NoAction, onUpdate: NoAction, map: "course_ibfk_1")
+  selectcourse  selectcourse[]
+  teachercourse teachercourse[]
+
+  @@index([collegeID], map: "collegeID")
+}
+
+model grades {
+  gradeID   Int       @id
+  gradename String    @db.VarChar(20)
+  collegeID Int
+  majorID   Int
+  classes   classes[]
+  college   college   @relation(fields: [collegeID], references: [collegeID], onDelete: NoAction, onUpdate: NoAction, map: "grades_ibfk_1")
+  major     major     @relation(fields: [majorID], references: [majorID], onDelete: NoAction, onUpdate: NoAction, map: "grades_ibfk_2")
+  student   student[]
+
+  @@index([collegeID], map: "collegeID")
+  @@index([majorID], map: "majorID")
+}
+
+model major {
+  majorID   Int       @id
+  majorname String    @db.VarChar(20)
+  collegeID Int
+  classes   classes[]
+  grades    grades[]
+  college   college   @relation(fields: [collegeID], references: [collegeID], onDelete: NoAction, onUpdate: NoAction, map: "major_ibfk_1")
+  student   student[]
+
+  @@index([collegeID], map: "collegeID")
+}
+
+model selectcourse {
+  sno       String    @db.Char(10)
+  Cno       String    @db.Char(10)
+  teacherID String?   @db.VarChar(10)
+  score     Int?
+  student   student   @relation(fields: [sno], references: [sno], onDelete: NoAction, onUpdate: NoAction, map: "selectcourse_ibfk_1")
+  course    course    @relation(fields: [Cno], references: [cno], onDelete: NoAction, onUpdate: NoAction, map: "selectcourse_ibfk_2")
+  teachers  teachers? @relation(fields: [teacherID], references: [teacherID], onDelete: NoAction, onUpdate: NoAction, map: "selectcourse_ibfk_3")
+
+  @@id([sno, Cno])
+  @@index([Cno], map: "Cno")
+  @@index([teacherID], map: "teacherID")
+}
+
+model student {
+  sno          String         @id @db.Char(10)
+  studentname  String         @db.VarChar(10)
+  password     String         @db.VarChar(120)
+  sex          String?        @db.Char(2)
+  birth        DateTime?      @db.Date
+  collegeID    Int?
+  majorID      Int?
+  gradeID      Int?
+  classID      Int?
+  tel          String?        @db.VarChar(16)
+  selectcourse selectcourse[]
+  college      college?       @relation(fields: [collegeID], references: [collegeID], onDelete: NoAction, onUpdate: NoAction, map: "student_ibfk_1")
+  major        major?         @relation(fields: [majorID], references: [majorID], onDelete: NoAction, onUpdate: NoAction, map: "student_ibfk_2")
+  grades       grades?        @relation(fields: [gradeID], references: [gradeID], onDelete: NoAction, onUpdate: NoAction, map: "student_ibfk_3")
+  classes      classes?       @relation(fields: [classID], references: [classID], onDelete: NoAction, onUpdate: NoAction, map: "student_ibfk_4")
+
+  @@index([classID], map: "classID")
+  @@index([collegeID], map: "collegeID")
+  @@index([gradeID], map: "gradeID")
+  @@index([majorID], map: "majorID")
+}
+
+model teachercourse {
+  cno       String   @db.Char(10)
+  teacherID String   @db.VarChar(10)
+  course    course   @relation(fields: [cno], references: [cno], onDelete: NoAction, onUpdate: NoAction, map: "teachercourse_ibfk_1")
+  teachers  teachers @relation(fields: [teacherID], references: [teacherID], onDelete: NoAction, onUpdate: NoAction, map: "teachercourse_ibfk_2")
+
+  @@id([cno, teacherID])
+  @@index([teacherID], map: "teacherID")
+}
+
+model teachers {
+  teacherID     String          @id @db.VarChar(10)
+  teachername   String          @db.VarChar(10)
+  password      String          @db.VarChar(120)
+  sex           String?         @db.Char(2)
+  birth         DateTime?       @db.Date
+  collegeID     Int?
+  tel           String?         @db.VarChar(16)
+  selectcourse  selectcourse[]
+  teachercourse teachercourse[]
+  college       college?        @relation(fields: [collegeID], references: [collegeID], onDelete: NoAction, onUpdate: NoAction, map: "teachers_ibfk_1")
+
+  @@index([collegeID], map: "collegeID")
+}
