@@ -1,17 +1,22 @@
 <script setup lang="ts">
 const { $trpc } = useNuxtApp()
+import { useAuthStore } from '~/store/auth'
 
-const { data, error } = await useAsyncData(() => $trpc.auth.login.query({
-  username: '2010010101',
-  password: '123456',
-  type: 'student',
-}))
+const test = () => {
+  const authStore = useAuthStore()
+  authStore.login('2010010101', '123456')
+}
+
+const test2 = () => {
+  $trpc.student.getStudentInfo.query().then((res) => {
+    console.log(res)
+  })
+}
 </script>
 
 <template>
   <div>
-    <button>测试登录</button>
-    <p>{{ data }}</p>
-    <p>{{ error }}</p>
+    <button @click="test">测试登录</button>
+    <button @click="test2">测试登录2</button>
   </div>
 </template>

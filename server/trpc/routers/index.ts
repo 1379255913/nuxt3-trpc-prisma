@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { publicProcedure, router } from '../trpc'
 import { authRouter } from './auth.router'
+import { studentRouter } from './student.router'
 
 export const appRouter = router({
   hello: publicProcedure
@@ -15,6 +16,7 @@ export const appRouter = router({
       }
     }),
   auth: authRouter,
+  student: studentRouter,
 })
 
 // export type definition of API

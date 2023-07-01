@@ -11,7 +11,7 @@ export async function createContext(event: H3Event) {
   const authorization = getRequestHeader(event, 'authorization')
   async function getUserFromHeader() {
     if (authorization) {
-      if (verifyJWT(authorization)) return null
+      if (!verifyJWT(authorization)) return null
       const user = await decodeJWT(authorization)
       return user
     }

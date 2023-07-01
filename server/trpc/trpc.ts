@@ -16,9 +16,22 @@ const isTeacher = t.middleware(({ next, ctx }) => {
   })
 })
 
+const isStudent = t.middleware(({ next, ctx }) => {
+  console.log(ctx.user)
+  if (ctx.user.type !== 'student') {
+    throw new TRPCError({ code: 'UNAUTHORIZED' })
+  }
+  return next({
+    ctx: {
+      user: ctx.user,
+    },
+  })
+})
+
 // 我们可以设置多个Procedure以供不同权限的调用
 export const publicProcedure = t.procedure;
-export const protectedProcedure = t.procedure.use(isTeacher)
+export const teacherProcedure = t.procedure.use(isTeacher)
+export const studentProcedure = t.procedure.use(isStudent)
 
 export const router = t.router;
 export const middleware = t.middleware;

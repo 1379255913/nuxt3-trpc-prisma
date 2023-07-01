@@ -12,7 +12,7 @@ export const authRouter = router({
         type: z.enum(['teacher', 'student']),
       }),
     )
-    .query(async ({ input }) => {
+    .mutation(async ({ input }) => {
       console.log(input);
       const { username, password } = input
       if (input.type === 'teacher') {
